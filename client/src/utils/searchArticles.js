@@ -1,5 +1,7 @@
 import axios from "axios";
 
+//var axios = require("axios");
+
 const buildQueryURL = (searchInput,callback) => {
     // queryURL is the url we'll use to query the API
     let queryURL = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
@@ -36,25 +38,29 @@ const buildQueryURL = (searchInput,callback) => {
   
     axios.get(queryURL).then(function (response) {
 
+        
         let results = [];
         for(let i=0; i<response.data.response.docs.length; i++){
 
             let article = {};
 
-            
             article.title = response.data.response.docs[i].headline.main;
             article.date = response.data.response.docs[i].pub_date;
-            article.author = response.data.response.docs[i].byline.original;
+            if(response.data.response.docs[i].byline !==null && response.data.response.docs[i].byline !==undefined) {
+              article.author = response.data.response.docs[i].byline.original;
+            } else { article.author = "New York Times"}
             article.url = response.data.response.docs[i].web_url;
-            //article.pic=response.data.response.docs[i].multimedia[1].url;
+            if(response.data.response.docs[i].multimedia[0] !== null && response.data.response.docs[i].multimedia[0] !== undefined) {
+            article.pic="https://www.nytimes.com/"+response.data.response.docs[i].multimedia[0].url;
+            } else {article.pic = "https://www.abortionno.org/wp-content/uploads/2016/02/no-image-found.jpg" }
 
             results.push(article);
             
 
         };
-
+       
         callback(results);
-        //console.log(response.data.response.docs[0]);
+        
        
       })
       .catch(function (error) {
